@@ -30,6 +30,8 @@ struct QuizQuestion {
 
 final class MovieQuizViewController: UIViewController {
     
+    @IBOutlet weak var noButton: UIButton!
+    @IBOutlet weak var yesButton: UIButton!
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
@@ -112,10 +114,24 @@ final class MovieQuizViewController: UIViewController {
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
+        // включаем кнопки Да и Нет
+        self.enableButtonYesAndNo()
+    }
+    
+    private func disableButtonYesAndNo() {
+        yesButton.isEnabled = false
+        noButton.isEnabled = false
+    }
+    
+    private func enableButtonYesAndNo() {
+        yesButton.isEnabled = true
+        noButton.isEnabled = true
     }
     
     // метод вызывается, когда пользователь нажимает на кнопку "Да"
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
+        // выключаем кнопки Да и НЕТ для исключения случайных нажатий
+        disableButtonYesAndNo()
         let currentQuestion = questions[currentQuestionIndex]
         let givenAnswer = true
         
@@ -124,6 +140,8 @@ final class MovieQuizViewController: UIViewController {
     
     // метод вызывается, когда пользователь нажимает на кнопку "Нет"
     @IBAction private func noButtonClicked(_ sender: UIButton) {
+        // выключаем кнопки Да и НЕТ для исключения случайных нажатий
+        disableButtonYesAndNo()
         let currentQuestion = questions[currentQuestionIndex]
         let givenAnswer = false
         
