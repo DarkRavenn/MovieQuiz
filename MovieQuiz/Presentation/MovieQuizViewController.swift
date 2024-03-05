@@ -130,7 +130,7 @@ final class MovieQuizViewController: UIViewController {
     
     // метод вызывается, когда пользователь нажимает на кнопку "Да"
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        // выключаем кнопки Да и НЕТ для исключения случайных нажатий
+        // выключаем кнопки Да и Нет для исключения случайных нажатий
         disableButtonYesAndNo()
         let currentQuestion = questions[currentQuestionIndex]
         let givenAnswer = true
@@ -140,7 +140,7 @@ final class MovieQuizViewController: UIViewController {
     
     // метод вызывается, когда пользователь нажимает на кнопку "Нет"
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        // выключаем кнопки Да и НЕТ для исключения случайных нажатий
+        // выключаем кнопки Да и Нет для исключения случайных нажатий
         disableButtonYesAndNo()
         let currentQuestion = questions[currentQuestionIndex]
         let givenAnswer = false
