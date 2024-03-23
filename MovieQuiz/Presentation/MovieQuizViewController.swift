@@ -1,8 +1,7 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterDelegate {
 
-    
     @IBOutlet private var noButton: UIButton!
     @IBOutlet private var yesButton: UIButton!
     @IBOutlet private var imageView: UIImageView!
@@ -10,13 +9,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var counterLabel: UILabel!
     
     private var correctAnswers = 0
-    
     // переменная с индексом текущего вопроса, начальное значение 0 (по этому индексу будем искать вопрос в массиве
     private var currentQuestionIndex = 0
     // переменная со счётчиком правильных ответов, начальное значение 0
     private let questionAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
+    private var alertPresenter: AlertPresenterProtocol?
     // переопределяем цвет статус бара
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -32,6 +31,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         self.questionFactory = questionFactory
         // берём текущий вопрос из массива вопросов по индексу текущего вопроса
         questionFactory.requestNextQuestion()
+        
+        let alertPresenter = AlertPresenter()
+        alertPresenter.delegate = self
+        self.alertPresenter = alertPresenter
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -46,6 +49,21 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
+    }
+    
+    // MARK: - AlertPresenterDelegate
+    func showAlert(alert: UIAlertController?) {
+        guard let alert = alert else {
+            return
+        }
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    func restartGame() {
+        currentQuestionIndex = 0
+        correctAnswers = 0
+        imageView.layer.borderColor = UIColor.clear.cgColor
+        questionFactory?.requestNextQuestion()
     }
     
     // приватный метод конвертации, который принимает моковый вопрос и возвращает вью модель для главного экрана
@@ -114,8 +132,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         
         // запускаем задачу через 1 секунду с помощью диспетчера задач
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in // слабая ссылка на self
-            guard let self = self else { return } // разворачиваем слабую ссылку
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
             // код, который мы хотим вызвать через 1 секунду
             self.showNextQuestionOrResults()
         }
@@ -126,52 +144,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionAmount - 1 {
             // идем в состояние "Результат квиза"
-            let text = "Ваш результат: \(correctAnswers)/10"
-            let viewModel = QuizResultsViewModel(
-                title: "Этот раунд окончен!",
-                text: text,
-                buttonText: "Сыграть еще раз")
-            show(quiz: viewModel)
+            alertPresenter?.requestResultAlert(correctAnswers: correctAnswers)
         } else {
             // идем в состояние "Следующий вопрос"
             imageView.layer.borderColor = UIColor.clear.cgColor
             currentQuestionIndex += 1
             questionFactory?.requestNextQuestion()
         }
-    }
-    
-    // приватный метод для показа результатов раунда квиза
-    // принимает вью модель QuizResultsViewModel и ничего не возвращает
-    private func show(quiz result: QuizResultsViewModel) {
-        // создаем объект всплывающего окна
-        let alert = UIAlertController(
-            title: result.title,       // заголовок всплывающего окна
-            message: result.text,      // текст во всплывающем окне
-            preferredStyle: .alert)    // preferredStyle может быть .alert или .actionSheet
-        
-        // создаем для алерта кнопку с действием
-        // в замыкании пишем, что должно происходить при нажатии на кнопку
-        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            
-            self.currentQuestionIndex = 0
-            
-            // сбрасываем переменную с количеством правильных ответов
-            self.correctAnswers = 0
-            
-            // скрываем цвет рамки
-            self.imageView.layer.borderColor = UIColor.clear.cgColor
-            
-            // заново показываем первый вопрос
-            self.questionFactory?.requestNextQuestion()
-        }
-        
-        // добавляем к алерту кнопку
-        alert.addAction(action)
-        
-        // показываем всплывающее окно
-        self.present(alert, animated: true, completion: nil)
-            
     }
 }
 
