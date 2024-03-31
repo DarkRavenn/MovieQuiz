@@ -10,25 +10,26 @@ import UIKit
 class AlertPresenter: AlertPresenterProtocol {
     weak var delegate: AlertPresenterDelegate?
     
-    func requestResultAlert(correctAnswers: Int?) {
-        guard let correctAnswers = correctAnswers else {
+    func requestResultAlert(with statistic: String?) {
+        guard let statistic = statistic  else {
             return
         }
-        delegate?.showAlert(alert: show(quiz: prepareAlertModel(correctAnswers)))
+        delegate?.showAlert(alert: show(quiz: preparationAndTransmissionOfAlertModel(with: statistic)))
     }
     
-    private func prepareAlertModel(_ correctAnswers: Int) -> AlertModel {
+    func preparationAndTransmissionOfAlertModel(with statistic: String) -> AlertModel {
         let alertModel: AlertModel = AlertModel(
              title: "Этот раунд окончен!",
-             text: "Ваш результат: \(correctAnswers)/10",
+             text: statistic,
              buttonText: "Сыграть еще раз",
              completion: {_ in
+                 print("Кнопка Сыграть еще раз была нажата!")
                  self.delegate?.restartGame()
              })
         return alertModel
     }
 
-    private func show(quiz result: AlertModel) -> UIAlertController {
+    func show(quiz result: AlertModel) -> UIAlertController {
                 let alert = UIAlertController(
                     title: result.title,
                     message: result.text,

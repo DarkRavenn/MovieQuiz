@@ -8,7 +8,8 @@
 import Foundation
 
 class QuestionFactory: QuestionFactoryProtocol {
-    // массив вопросов
+    
+    weak var delegate: QuestionFactoryDelegate?
     
     private let questions: [QuizQuestion] = [
         QuizQuestion(
@@ -52,8 +53,6 @@ class QuestionFactory: QuestionFactoryProtocol {
             text: "Рейтинг этого фильма больше чем 6?",
             correctAnswer: false),
     ]
-    
-    weak var delegate: QuestionFactoryDelegate?
     
     func requestNextQuestion() { // 1
         guard let index = (0..<questions.count).randomElement() else {
