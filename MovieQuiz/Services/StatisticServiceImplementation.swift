@@ -59,7 +59,7 @@ class StatisticServiceImplementation: StatisticService {
         
         gamesCount += 1
         
-        CalculationTotalAccuracy(correct: count, total: amount)
+        calculationTotalAccuracy(correct: count, total: amount)
         
         let currentDate = Date()
         
@@ -82,7 +82,7 @@ class StatisticServiceImplementation: StatisticService {
         delegate?.transmitting(statistic)
     }
     
-    private func CalculationTotalAccuracy(correct count: Int, total amount: Int) {
+    private func calculationTotalAccuracy(correct count: Int, total amount: Int) {
         if gamesCount == 1 {
             totalAccuracy = (Double(count) / Double(amount)) * 100
         } else {
