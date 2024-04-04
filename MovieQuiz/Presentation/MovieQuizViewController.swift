@@ -2,11 +2,12 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterDelegate, StatisticServiceImplementationDelegate {
 
-    @IBOutlet private var noButton: UIButton!
-    @IBOutlet private var yesButton: UIButton!
-    @IBOutlet private var imageView: UIImageView!
-    @IBOutlet private var textLabel: UILabel!
+    @IBOutlet private weak var noButton: UIButton!
+    @IBOutlet private weak var yesButton: UIButton!
+    @IBOutlet private weak var imageView: UIImageView!
+    @IBOutlet private weak var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
+    @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
@@ -142,4 +143,38 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             questionFactory?.requestNextQuestion()
         }
     }
+    
+    private func temp(_ statistic: String) {
+        
+    }
+    
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false // говорим что индикатор загрузки не скрыт
+        activityIndicator.startAnimating() // включаем анимацию
+    }
+    
+    private func hideLoadingIndicator() {
+        activityIndicator.isHidden = true // скрываем индикатор загрузки?
+        activityIndicator.stopAnimating() // выключаем анимацию
+    }
+    
+    private func showNetworkError(message: String) {
+        hideLoadingIndicator()
+        
+        let model = AlertModel(title: "Ошибка",
+                               text: message,
+                               buttonText: "Попробовать еще раз") { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            
+            self.questionFactory?.requestNextQuestion()
+        }
+        
+//        alertPresenter.show(in: self, model: model)
+//        alertPresenter?.show(quiz: model)
+    }
+    
+    
 }
