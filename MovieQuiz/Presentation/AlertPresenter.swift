@@ -10,23 +10,11 @@ import UIKit
 class AlertPresenter: AlertPresenterProtocol {
     weak var delegate: AlertPresenterDelegate?
     
-    func requestResultAlert(with statistic: String?) {
-        guard let statistic = statistic  else {
+    func requestAlert(with alertModel: AlertModel?) {
+        guard let statistic = alertModel  else {
             return
         }
-        delegate?.showAlert(alert: show(quiz: preparationAndTransmissionOfAlertModel(with: statistic)))
-    }
-    
-    func preparationAndTransmissionOfAlertModel(with statistic: String) -> AlertModel {
-        let alertModel: AlertModel = AlertModel(
-             title: "Этот раунд окончен!",
-             text: statistic,
-             buttonText: "Сыграть еще раз",
-             completion: {_ in
-                 print("Кнопка Сыграть еще раз была нажата!")
-                 self.delegate?.restartGame()
-             })
-        return alertModel
+        delegate?.showAlert(alert: show(quiz: statistic))
     }
 
     func show(quiz result: AlertModel) -> UIAlertController {

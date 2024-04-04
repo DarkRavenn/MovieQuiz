@@ -64,7 +64,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     // MARK: - StatisticServiceImplementationDelegate
     func transmitting(_ statistic: String) {
-        alertPresenter?.requestResultAlert(with: statistic)
+        let resultAlertModel: AlertModel = AlertModel(
+             title: "Этот раунд окончен!",
+             text: statistic,
+             buttonText: "Сыграть еще раз",
+             completion: {_ in
+                 print("Кнопка Сыграть еще раз была нажата!")
+                 self.restartGame()
+             })
+        alertPresenter?.requestAlert(with: resultAlertModel)
     }
     
     func restartGame() {
@@ -161,7 +169,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     private func showNetworkError(message: String) {
         hideLoadingIndicator()
         
-        let model = AlertModel(title: "Ошибка",
+        let errorAlertModel = AlertModel(title: "Ошибка",
                                text: message,
                                buttonText: "Попробовать еще раз") { [weak self] _ in
             guard let self = self else { return }
@@ -172,8 +180,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             self.questionFactory?.requestNextQuestion()
         }
         
-//        alertPresenter.show(in: self, model: model)
-//        alertPresenter?.show(quiz: model)
+        alertPresenter?.requestAlert(with: errorAlertModel)
     }
     
     

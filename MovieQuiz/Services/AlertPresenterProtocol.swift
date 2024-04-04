@@ -8,7 +8,6 @@
 import UIKit
 
 protocol AlertPresenterProtocol {
-    func requestResultAlert(with statistic: String?)
-    func preparationAndTransmissionOfAlertModel(with statistic: String) -> AlertModel
+    func requestAlert(with alertModel: AlertModel?)
     func show(quiz result: AlertModel) -> UIAlertController
 }
