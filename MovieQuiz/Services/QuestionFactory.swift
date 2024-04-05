@@ -67,10 +67,15 @@ class QuestionFactory: QuestionFactoryProtocol {
                     guard let self = self else { return }
                     switch result {
                     case .success(let mostPopularMovies):
-                        self.movies = mostPopularMovies.items // сохраняем фильм в нашу новую переменную
-                        self.delegate?.didLoadDataFromServer() // сообщаем, что данные загрузились
+                        if mostPopularMovies.errorMessage == "" {
+                            self.movies = mostPopularMovies.items
+                            self.delegate?.didLoadDataFromServer()
+                        } else {
+                            self.delegate?.didLoadDataFromServer(with: mostPopularMovies.errorMessage)
+                        }
+                        
                     case .failure(let error):
-                        self.delegate?.didFailToLoadData(with: error) // сообщаем об ошибке нашему MovieQuizViewController
+                        self.delegate?.didFailToLoadData(with: error)
                     }
                 }
             }
@@ -93,8 +98,10 @@ class QuestionFactory: QuestionFactoryProtocol {
             
             let rating = Float(movie.rating) ?? 0
             
-            let text = "Рейтинг этого фильма больше чем 7?"
-            let correctAnswer = rating > 7
+            let randomRating = (7...9).randomElement() ?? 0
+            
+            let text = "Рейтинг этого фильма больше чем \(randomRating)?"
+            let correctAnswer = rating > Float(randomRating)
             
             let question = QuizQuestion(image: imageData,
                                         text: text,
