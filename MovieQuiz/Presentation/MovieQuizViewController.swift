@@ -33,6 +33,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         statisticService = StatisticServiceImplementation()
         
         questionFactory?.loadData()
+        activityIndicator.hidesWhenStopped = true
         showLoadingIndicator()
                 
     }
@@ -51,7 +52,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func didLoadDataFromServer() {
-        activityIndicator.isHidden = true
+        hideLoadingIndicator()
             questionFactory?.requestNextQuestion()
     }
     
@@ -102,7 +103,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
         self.switchButton(IsEnabled: true)
-        activityIndicator.isHidden = true
+        hideLoadingIndicator()
     }
     
     private func showResultQuiz() {
@@ -161,18 +162,24 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         } else {
             imageView.layer.borderColor = UIColor.clear.cgColor
             currentQuestionIndex += 1
-            activityIndicator.isHidden = false
+            showLoadingIndicator()
             questionFactory?.requestNextQuestion()
         }
     }
     
     private func showLoadingIndicator() {
-        activityIndicator.isHidden = false
         activityIndicator.startAnimating()
+
     }
     
+    private func hideLoadingIndicator() {
+        activityIndicator.stopAnimating()
+    }
+    
+    
+    
     private func showNetworkError(message: String) {
-        activityIndicator.isHidden = true
+        hideLoadingIndicator()
         let title = "Ошибка"
         let buttonText = "Попробовать еще раз"
         
@@ -185,7 +192,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func showErrorLoadImage(with error: Error) {
-        activityIndicator.isHidden = true
+        hideLoadingIndicator()
         let title = "Ошибка"
         let message = "Изображение не загруженно: \n \(error)"
         let buttonText = "Попробовать еще раз"
