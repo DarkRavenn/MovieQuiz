@@ -63,6 +63,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         showNetworkError(message: error.localizedDescription)
     }
     
+    func didLoadImageFromServer(with error: Error) {
+        showErrorLoadImage(with: error)
+    }
+    
     // MARK: - Actions
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
@@ -178,26 +182,31 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         alertPresenter.show(in: self, model: model)
     }
     
+    private func showErrorLoadImage(with error: Error) {
+        activityIndicator.isHidden = true
+        let title = "Ошибка"
+        let message = "Изображение не загруженно: \n \(error)"
+        let buttonText = "Попробовать еще раз"
+        
+        let model = AlertModel(title: title, message: message, buttonText: buttonText) { [weak self] in
+            guard let self = self else { return }
+            
+            questionFactory?.requestNextQuestion()
+        }
+        alertPresenter.show(in: self, model: model)
+    }
+    
     func restartGame() {
         currentQuestionIndex = 0
         correctAnswers = 0
         imageView.layer.borderColor = UIColor.clear.cgColor
-        questionFactory?.requestNextQuestion()
+        questionFactory?.loadData()
+        showLoadingIndicator()
     }
     
     
     private func switchButton(IsEnabled: Bool) {
         yesButton.isEnabled = IsEnabled
         noButton.isEnabled = IsEnabled
-    }
-
-    private func temp(_ statistic: String) {
-        
-    }
-    
-    
-    
-    
-    
-    
+    } 
 }
