@@ -102,6 +102,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
         self.switchButton(IsEnabled: true)
+        activityIndicator.isHidden = true
     }
     
     private func showResultQuiz() {
@@ -160,6 +161,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         } else {
             imageView.layer.borderColor = UIColor.clear.cgColor
             currentQuestionIndex += 1
+            activityIndicator.isHidden = false
             questionFactory?.requestNextQuestion()
         }
     }
