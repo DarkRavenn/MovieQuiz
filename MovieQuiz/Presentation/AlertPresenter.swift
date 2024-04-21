@@ -7,29 +7,19 @@
 
 import UIKit
 
-class AlertPresenter: AlertPresenterProtocol {
-    weak var delegate: AlertPresenterDelegate?
-    
-    func requestAlert(with alertModel: AlertModel?) {
-        guard let statistic = alertModel  else {
-            return
+class AlertPresenter {
+    func show(in vc: UIViewController, model: AlertModel) {
+        let alert = UIAlertController(
+            title: model.title,
+            message: model.message,
+            preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: model.buttonText, style: .default) { _ in
+            model.completion()
         }
-        delegate?.showAlert(alert: show(quiz: statistic))
+        
+        alert.addAction(action)
+        
+        vc.present(alert, animated: true, completion: nil)
     }
-
-    func show(quiz result: AlertModel) -> UIAlertController {
-                let alert = UIAlertController(
-                    title: result.title,
-                    message: result.text,
-                    preferredStyle: .alert)
-        
-        let action = UIAlertAction(title: result.buttonText, style: .default, handler: result.completion)
-        
-                alert.addAction(action)
-        
-        return alert
-    }
-    
-
-    
 }
