@@ -59,7 +59,6 @@ struct StubNetworkClient: NetworkRouting {
     }
 }
 
-
 class MoviesLoaderTests: XCTestCase {
     func testSuccessLoading() throws {
         // Given ( Дано )
@@ -105,3 +104,5 @@ class MoviesLoaderTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 }
+
+

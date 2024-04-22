@@ -19,6 +19,8 @@ class AlertPresenter {
         }
         
         alert.addAction(action)
+        alert.view.accessibilityIdentifier = "Game results"
+
         
         vc.present(alert, animated: true, completion: nil)
     }

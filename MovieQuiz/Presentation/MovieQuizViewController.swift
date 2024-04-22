@@ -56,10 +56,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             questionFactory?.requestNextQuestion()
     }
     
-    func didLoadDataFromServer(with errorMessage: String) {
-        showNetworkError(message: errorMessage)
-    }
-    
     func didFailToLoadData(with error: Error) {
         showNetworkError(message: error.localizedDescription)
     }

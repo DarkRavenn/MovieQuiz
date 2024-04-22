@@ -21,7 +21,11 @@ struct MoviesLoader: MoviesLoading {
     
     // MARK: - URL
     private var mostPopularMoviesUrl: URL {
-        guard let url = URL(string: "https://tv-api.com/en/API/Top250Movies/k_zcuw1ytf") else {
+        let baseUrl = "https://tv-api.com/en/API"
+        let method = "/Top250Movies"
+        let apiKey = "/k_zcuw1ytf"
+        
+        guard let url = URL(string: baseUrl + method + apiKey) else {
             preconditionFailure("Unable to construct mostPopularMoviesUrl")
         }
         return url
@@ -34,7 +38,12 @@ struct MoviesLoader: MoviesLoading {
             case .success(let data):
                 do {
                     let mostPopularMovies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
-                    handler(.success(mostPopularMovies))
+                    if mostPopularMovies.errorMessage == "" {
+                        handler(.success(mostPopularMovies))
+                    } else {
+                        handler(.failure(mostPopularMovies.errorMessage))
+                        
+                    }
                 } catch {
                     handler(.failure(error))
                 }

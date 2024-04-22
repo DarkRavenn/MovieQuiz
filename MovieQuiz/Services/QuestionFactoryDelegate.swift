@@ -10,7 +10,6 @@ import Foundation
 protocol QuestionFactoryDelegate: AnyObject {
     func didReceiveNextQuestion(question: QuizQuestion?)
     func didLoadDataFromServer()
-    func didLoadDataFromServer(with errorMessage: String)
     func didLoadImageFromServer(with error: Error) 
     func didFailToLoadData(with error: Error)
 }
