@@ -11,13 +11,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private var correctAnswers = 0
     
-    private var currentQuestionIndex: Int = 0
-    private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
     private var statisticService: StatisticService?
     
     private var alertPresenter = AlertPresenter()
+    
+    private let presenter = MovieQuizPresenter()
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -45,7 +45,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
         
         currentQuestion = question
-        let viewModel = convert(model: question)
+        let viewModel = presenter.convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
@@ -87,12 +87,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     // MARK: - Private functions
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        return QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-    }
     
     private func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
@@ -119,12 +113,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     func getStatistic() -> String {
         var statisticMessage = ""
         if let statisticService = statisticService {
-            statisticService.store(correct: correctAnswers, total: questionsAmount)
+            statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
             
             let bestGame = statisticService.bestGame
             
             let totalPlaysCountLine = "Количество сыгранных квизов: \(statisticService.gamesCount)"
-            let currentGameResultLine = "Ваш результат: \(correctAnswers)\\\(questionsAmount)"
+            let currentGameResultLine = "Ваш результат: \(correctAnswers)\\\(presenter.questionsAmount)"
             let bestGameInfoLine = "Рекорд: \(bestGame.correct)\\\(bestGame.total)"
             + " (\(bestGame.date.dateTimeString))"
             let averageAccuracyLine = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
@@ -153,11 +147,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func showNextQuestionOrResults() {
-        if currentQuestionIndex == questionsAmount - 1 {
+        if presenter.isLastQuestion() {
             showResultQuiz()
         } else {
             imageView.layer.borderColor = UIColor.clear.cgColor
-            currentQuestionIndex += 1
+            presenter.switchToNextQuestion()
             showLoadingIndicator()
             questionFactory?.requestNextQuestion()
         }
@@ -202,7 +196,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func restartGame() {
-        currentQuestionIndex = 0
+        presenter.resetQuestionIndex()
         correctAnswers = 0
         imageView.layer.borderColor = UIColor.clear.cgColor
         questionFactory?.loadData()
