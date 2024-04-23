@@ -57,7 +57,7 @@ final class MovieQuizViewController: UIViewController {
     func showResultQuiz() {
         let title = "Этот раунд окончен!"
         let buttonText = "Сыграть ещё раз"
-        let message = getStatistic()
+        let message = presenter.makeResultMessage()
         
         let model = AlertModel(title: title, message: message, buttonText: buttonText) { [weak self] in
             guard let self = self else { return }
@@ -68,39 +68,12 @@ final class MovieQuizViewController: UIViewController {
         
     }
     
-    func getStatistic() -> String {
-        var statisticMessage = ""
-        if let statisticService = statisticService {
-            statisticService.store(correct: presenter.correctAnswers, total: presenter.questionsAmount)
-            
-            let bestGame = statisticService.bestGame
-            
-            let totalPlaysCountLine = "Количество сыгранных квизов: \(statisticService.gamesCount)"
-            let currentGameResultLine = "Ваш результат: \(presenter.correctAnswers)\\\(presenter.questionsAmount)"
-            let bestGameInfoLine = "Рекорд: \(bestGame.correct)\\\(bestGame.total)"
-            + " (\(bestGame.date.dateTimeString))"
-            let averageAccuracyLine = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
-            
-            let resultMessage = [
-                currentGameResultLine, totalPlaysCountLine, bestGameInfoLine, averageAccuracyLine
-            ].joined(separator: "\n")
-            statisticMessage = resultMessage
-        }
-        return statisticMessage
-    }
-    
-    func showAnswerResult(isCorrect: Bool) {
-        presenter.didAnswer(isCorrectAnswer: isCorrect)
-        
+    func highlightImageBorder(isCorrect: Bool) {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.cornerRadius = 20
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
-            self.presenter.showNextQuestionOrResults()
-        }
     }
     
     func showLoadingIndicator() {
@@ -115,6 +88,7 @@ final class MovieQuizViewController: UIViewController {
     func hideBorderPoster() {
         imageView.layer.borderColor = UIColor.clear.cgColor
     }
+    
     
     func showNetworkError(message: String) {
         hideLoadingIndicator()
