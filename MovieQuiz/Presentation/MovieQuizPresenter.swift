@@ -10,7 +10,7 @@ import UIKit
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     private let statisticService: StatisticService!
     private var questionFactory: QuestionFactoryProtocol?
-    private weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewControllerProtocol?
     
     private var currentQuestion: QuizQuestion?
     private let questionsAmount: Int = 10
@@ -18,7 +18,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var correctAnswers = 0
     
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         
         statisticService = StatisticServiceImplementation()
@@ -128,7 +128,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private func proceedWithAnswer(isCorrect: Bool) {
         didAnswer(isCorrectAnswer: isCorrect)
     
-        viewController?.highlightImageBorder(isCorrect: isCorrect)
+        viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }

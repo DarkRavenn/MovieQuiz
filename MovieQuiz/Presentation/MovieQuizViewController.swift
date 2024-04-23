@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     @IBOutlet private weak var noButton: UIButton!
     @IBOutlet private weak var yesButton: UIButton!
     @IBOutlet private weak var imageView: UIImageView!
@@ -64,7 +64,7 @@ final class MovieQuizViewController: UIViewController {
         
     }
     
-    func highlightImageBorder(isCorrect: Bool) {
+    func highlightImageBorder(isCorrectAnswer isCorrect: Bool) {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
