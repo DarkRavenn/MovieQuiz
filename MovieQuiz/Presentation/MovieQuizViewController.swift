@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+final class MovieQuizViewController: UIViewController {
 
     @IBOutlet private weak var noButton: UIButton!
     @IBOutlet private weak var yesButton: UIButton!
@@ -9,14 +9,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
-//    private var correctAnswers = 0 // надо будет удалить
-    private var questionFactory: QuestionFactoryProtocol? // надо будет удалить
-    
     private var statisticService: StatisticService?
-    
     private var alertPresenter = AlertPresenter()
-    
-    private let presenter = MovieQuizPresenter()
+    private var presenter: MovieQuizPresenter!
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -28,32 +23,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         super.viewDidLoad()
         
         imageView.layer.cornerRadius = 20
-        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        
         statisticService = StatisticServiceImplementation()
         
-        questionFactory?.loadData()
         activityIndicator.hidesWhenStopped = true
         showLoadingIndicator()
-        presenter.viewController = self
+        presenter = MovieQuizPresenter(viewController: self)
                 
-    }
-    
-    // MARK: - QuestionFactoryDelegate
-    func didReceiveNextQuestion(question: QuizQuestion?) {
-        presenter.didReceiveNextQuestion(question: question)
-    }
-    
-    func didLoadDataFromServer() {
-        hideLoadingIndicator()
-            questionFactory?.requestNextQuestion()
-    }
-    
-    func didFailToLoadData(with error: Error) {
-        showNetworkError(message: error.localizedDescription)
-    }
-    
-    func didLoadImageFromServer(with error: Error) {
-        showErrorLoadImage(with: error)
     }
     
     // MARK: - Actions
@@ -123,7 +99,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
-            self.presenter.questionFactory = self.questionFactory
             self.presenter.showNextQuestionOrResults()
         }
     }
@@ -141,7 +116,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         imageView.layer.borderColor = UIColor.clear.cgColor
     }
     
-    private func showNetworkError(message: String) {
+    func showNetworkError(message: String) {
         hideLoadingIndicator()
         let title = "Ошибка"
         let buttonText = "Попробовать еще раз"
@@ -163,7 +138,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let model = AlertModel(title: title, message: message, buttonText: buttonText) { [weak self] in
             guard let self = self else { return }
             
-            questionFactory?.requestNextQuestion()
+            presenter.restartGame()
         }
         alertPresenter.show(in: self, model: model)
     }
