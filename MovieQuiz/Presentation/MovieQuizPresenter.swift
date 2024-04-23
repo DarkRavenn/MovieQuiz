@@ -11,6 +11,9 @@ final class MovieQuizPresenter {
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
     
+    var correctAnswers = 0
+    var questionFactory: QuestionFactoryProtocol?
+    
     var currentQuestion: QuizQuestion?
     weak var viewController: MovieQuizViewController?
     
@@ -59,6 +62,17 @@ final class MovieQuizPresenter {
         let viewModel = convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.viewController?.show(quiz: viewModel)
+        }
+    }
+    
+    func showNextQuestionOrResults() {
+        if self.isLastQuestion() {
+            viewController?.showResultQuiz()
+        } else {
+            self.switchToNextQuestion()
+            viewController?.hideBorderPoster()
+            viewController?.showLoadingIndicator()
+            questionFactory?.requestNextQuestion()
         }
     }
 }

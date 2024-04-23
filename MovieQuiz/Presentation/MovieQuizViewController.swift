@@ -9,9 +9,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
-    private var correctAnswers = 0
+    private var correctAnswers = 0 // надо будет удалить
+    private var questionFactory: QuestionFactoryProtocol? // надо будет удалить
     
-    private var questionFactory: QuestionFactoryProtocol?
     private var statisticService: StatisticService?
     
     private var alertPresenter = AlertPresenter()
@@ -78,7 +78,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         hideLoadingIndicator()
     }
     
-    private func showResultQuiz() {
+    func showResultQuiz() {
         let title = "Этот раунд окончен!"
         let buttonText = "Сыграть ещё раз"
         let message = getStatistic()
@@ -124,28 +124,23 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
-            self.showNextQuestionOrResults()
+            self.presenter.correctAnswers = self.correctAnswers
+            self.presenter.questionFactory = self.questionFactory
+            self.presenter.showNextQuestionOrResults()
         }
     }
     
-    private func showNextQuestionOrResults() {
-        if presenter.isLastQuestion() {
-            showResultQuiz()
-        } else {
-            imageView.layer.borderColor = UIColor.clear.cgColor
-            presenter.switchToNextQuestion()
-            showLoadingIndicator()
-            questionFactory?.requestNextQuestion()
-        }
-    }
-    
-    private func showLoadingIndicator() {
+    func showLoadingIndicator() {
         activityIndicator.startAnimating()
 
     }
     
-    private func hideLoadingIndicator() {
+    func hideLoadingIndicator() {
         activityIndicator.stopAnimating()
+    }
+    
+    func hideBorderPoster() {
+        imageView.layer.borderColor = UIColor.clear.cgColor
     }
     
     
