@@ -21,8 +21,13 @@ final class MovieQuizPresenter {
         currentQuestionIndex == questionsAmount - 1
     }
     
-    func resetQuestionIndex() {
+    func restartGame() {
+        correctAnswers = 0
         currentQuestionIndex = 0
+        viewController?.hideBorderPoster()
+        questionFactory?.loadData()
+        viewController?.showLoadingIndicator()
+        
     }
     
     func switchToNextQuestion() {
@@ -73,6 +78,12 @@ final class MovieQuizPresenter {
             viewController?.hideBorderPoster()
             viewController?.showLoadingIndicator()
             questionFactory?.requestNextQuestion()
+        }
+    }
+    
+    func didAnswer(isCorrectAnswer: Bool) {
+        if isCorrectAnswer {
+            correctAnswers += 1
         }
     }
 }
