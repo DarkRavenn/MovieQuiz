@@ -12,7 +12,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var correctAnswers = 0
     
     private var questionFactory: QuestionFactoryProtocol?
-    private var currentQuestion: QuizQuestion?
     private var statisticService: StatisticService?
     
     private var alertPresenter = AlertPresenter()
@@ -41,15 +40,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        guard let question = question else {
-            return
-        }
-        
-        currentQuestion = question
-        let viewModel = presenter.convert(model: question)
-        DispatchQueue.main.async { [weak self] in
-            self?.show(quiz: viewModel)
-        }
+        presenter.didReceiveNextQuestion(question: question)
     }
     
     func didLoadDataFromServer() {
@@ -69,19 +60,17 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         switchButton(IsEnabled: false)
-        presenter.currentQuestion = currentQuestion
         presenter.yesButtonClicked()
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         switchButton(IsEnabled: false)
-        presenter.currentQuestion = currentQuestion
         presenter.yesButtonClicked()
     }
     
     // MARK: - Private functions
     
-    private func show(quiz step: QuizStepViewModel) {
+    func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
