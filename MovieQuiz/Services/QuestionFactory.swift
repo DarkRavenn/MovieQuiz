@@ -49,7 +49,7 @@ class QuestionFactory: QuestionFactoryProtocol {
             } catch {
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
-                    self.delegate?.didLoadImageFromServer(with: error)
+                    self.delegate?.didFailToLoadData(with: error)
                 }
             }
             

@@ -40,7 +40,7 @@ final class MovieQuizViewController: UIViewController {
         presenter.yesButtonClicked()
     }
     
-    // MARK: - Functions
+    // MARK: Public methods
     
     func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
@@ -93,25 +93,12 @@ final class MovieQuizViewController: UIViewController {
         let model = AlertModel(title: title, message: message, buttonText: buttonText) { [weak self] in
             guard let self = self else { return }
             
-            presenter.restartGame()
-        }
-        alertPresenter.show(in: self, model: model)
-    }
-    
-    func showErrorLoadImage(message: String) {
-        hideLoadingIndicator()
-        let title = "Что-то пошло не так("
-        let buttonText = "Попробовать еще раз"
-        
-        let model = AlertModel(title: title, message: message, buttonText: buttonText) { [weak self] in
-            guard let self = self else { return }
-            
             presenter.skipCurrentQuestion()
         }
         alertPresenter.show(in: self, model: model)
     }
     
-    // MARK: - Private functions
+    // MARK: - Private methods
     
     private func switchButton(IsEnabled: Bool) {
         yesButton.isEnabled = IsEnabled

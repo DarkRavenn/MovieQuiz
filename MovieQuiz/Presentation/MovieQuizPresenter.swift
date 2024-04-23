@@ -40,11 +40,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         viewController?.showNetworkError(message: message)
     }
     
-    func didLoadImageFromServer(with error: Error) {
-        let message = error.localizedDescription
-        viewController?.showErrorLoadImage(message: message)
-    }
-    
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
             return
@@ -57,7 +52,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
-    // MARK: - Function
+    // MARK: Public methods
 
     func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
@@ -119,7 +114,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         return resultMessage
     }
     
-    // MARK: - Private function
+    // MARK: - Private methods
     
     private func didAnswer(isYes: Bool) {
         guard let currentQuestion = currentQuestion else {

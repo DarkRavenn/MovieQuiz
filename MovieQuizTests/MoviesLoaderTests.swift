@@ -61,15 +61,12 @@ struct StubNetworkClient: NetworkRouting {
 
 class MoviesLoaderTests: XCTestCase {
     func testSuccessLoading() throws {
-        // Given ( Дано )
         let stubNetworkClient = StubNetworkClient(emulateError: false)
         let loader = MoviesLoader(networkClient: stubNetworkClient)
         
-        // When ( Когда )
         let expectation = expectation(description: "Loading expectation")
         
         loader.loadMovies { result in
-            // Then ( Тогда )
             switch result {
             case .success(let movies):
                 XCTAssertEqual(movies.items.count, 2)
@@ -83,15 +80,12 @@ class MoviesLoaderTests: XCTestCase {
     }
     
     func testFailureLoading() throws {
-        // Given ( Дано )
         let stubNetworkClient = StubNetworkClient(emulateError: true)
         let loader = MoviesLoader(networkClient: stubNetworkClient)
         
-        // When ( Когда )
         let expectation = expectation(description: "Loading expectation")
         
         loader.loadMovies { result in
-            // Then ( Тогда )
             switch result {
             case .failure(let error):
                 XCTAssertNotNil(error)
