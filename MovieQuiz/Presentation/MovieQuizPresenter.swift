@@ -10,7 +10,13 @@ import UIKit
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     private let statisticService: StatisticService!
     private var questionFactory: QuestionFactoryProtocol?
-    weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewController?
+    
+    private var currentQuestion: QuizQuestion?
+    private let questionsAmount: Int = 10
+    private var currentQuestionIndex: Int = 0
+    private var correctAnswers = 0
+    
     
     init(viewController: MovieQuizViewController) {
         self.viewController = viewController
@@ -22,13 +28,8 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         viewController.showLoadingIndicator()
     }
     
-    let questionsAmount: Int = 10
-    var correctAnswers = 0
-    var currentQuestion: QuizQuestion?
-    
-    private var currentQuestionIndex: Int = 0
-    
     // MARK: - QuestionFactoryDelegate
+    
     func didLoadDataFromServer() {
         viewController?.hideLoadingIndicator()
         questionFactory?.requestNextQuestion()
@@ -41,7 +42,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     func didLoadImageFromServer(with error: Error) {
         let message = error.localizedDescription
-        viewController?.showNetworkError(message: message)
+        viewController?.showErrorLoadImage(message: message)
     }
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
@@ -56,10 +57,16 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
-    // ---
+    // MARK: - Function
 
     func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
+    }
+    
+    func didAnswer(isCorrectAnswer: Bool) {
+        if isCorrectAnswer {
+            correctAnswers += 1
+        }
     }
     
     func restartGame() {
@@ -69,6 +76,11 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         questionFactory?.loadData()
         viewController?.showLoadingIndicator()
         
+    }
+    
+    func skipCurrentQuestion() {
+        questionFactory?.loadData()
+        viewController?.showLoadingIndicator()
     }
     
     func switchToNextQuestion() {
@@ -90,32 +102,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         didAnswer(isYes: false)
     }
     
-    private func didAnswer(isYes: Bool) {
-        guard let currentQuestion = currentQuestion else {
-            return
-        }
-        let givenAnswer = isYes
-        
-        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-    }
-    
-    func proceedToNextQuestionOrResults() {
-        if self.isLastQuestion() {
-            viewController?.showResultQuiz()
-        } else {
-            self.switchToNextQuestion()
-            viewController?.hideBorderPoster()
-            viewController?.showLoadingIndicator()
-            questionFactory?.requestNextQuestion()
-        }
-    }
-    
-    func didAnswer(isCorrectAnswer: Bool) {
-        if isCorrectAnswer {
-            correctAnswers += 1
-        }
-    }
-    
     func makeResultMessage() -> String {
         statisticService.store(correct: correctAnswers, total: questionsAmount)
         
@@ -133,7 +119,18 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         return resultMessage
     }
     
-    func proceedWithAnswer(isCorrect: Bool) {
+    // MARK: - Private function
+    
+    private func didAnswer(isYes: Bool) {
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        let givenAnswer = isYes
+        
+        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    
+    private func proceedWithAnswer(isCorrect: Bool) {
         didAnswer(isCorrectAnswer: isCorrect)
     
         viewController?.highlightImageBorder(isCorrect: isCorrect)
@@ -141,6 +138,17 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             self.proceedToNextQuestionOrResults()
+        }
+    }
+    
+    private func proceedToNextQuestionOrResults() {
+        if self.isLastQuestion() {
+            viewController?.showResultQuiz()
+        } else {
+            self.switchToNextQuestion()
+            viewController?.hideBorderPoster()
+            viewController?.showLoadingIndicator()
+            questionFactory?.requestNextQuestion()
         }
     }
 }

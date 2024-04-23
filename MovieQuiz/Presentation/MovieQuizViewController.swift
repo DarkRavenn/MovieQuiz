@@ -1,15 +1,13 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController {
-
     @IBOutlet private weak var noButton: UIButton!
     @IBOutlet private weak var yesButton: UIButton!
     @IBOutlet private weak var imageView: UIImageView!
     @IBOutlet private weak var textLabel: UILabel!
-    @IBOutlet private var counterLabel: UILabel!
+    @IBOutlet private weak var counterLabel: UILabel!
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
-    private var statisticService: StatisticService?
     private var alertPresenter = AlertPresenter()
     private var presenter: MovieQuizPresenter!
     
@@ -19,17 +17,15 @@ final class MovieQuizViewController: UIViewController {
     
     
     // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        presenter = MovieQuizPresenter(viewController: self)
+        
         imageView.layer.cornerRadius = 20
         
-        statisticService = StatisticServiceImplementation()
-        
         activityIndicator.hidesWhenStopped = true
-        showLoadingIndicator()
-        presenter = MovieQuizPresenter(viewController: self)
-                
     }
     
     // MARK: - Actions
@@ -44,7 +40,7 @@ final class MovieQuizViewController: UIViewController {
         presenter.yesButtonClicked()
     }
     
-    // MARK: - Private functions
+    // MARK: - Functions
     
     func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
@@ -71,7 +67,6 @@ final class MovieQuizViewController: UIViewController {
     func highlightImageBorder(isCorrect: Bool) {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
-        imageView.layer.cornerRadius = 20
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         
     }
@@ -92,7 +87,7 @@ final class MovieQuizViewController: UIViewController {
     
     func showNetworkError(message: String) {
         hideLoadingIndicator()
-        let title = "Ошибка"
+        let title = "Что-то пошло не так("
         let buttonText = "Попробовать еще раз"
         
         let model = AlertModel(title: title, message: message, buttonText: buttonText) { [weak self] in
@@ -103,19 +98,20 @@ final class MovieQuizViewController: UIViewController {
         alertPresenter.show(in: self, model: model)
     }
     
-    private func showErrorLoadImage(with error: Error) {
+    func showErrorLoadImage(message: String) {
         hideLoadingIndicator()
-        let title = "Ошибка"
-        let message = "Изображение не загруженно: \n \(error)"
+        let title = "Что-то пошло не так("
         let buttonText = "Попробовать еще раз"
         
         let model = AlertModel(title: title, message: message, buttonText: buttonText) { [weak self] in
             guard let self = self else { return }
             
-            presenter.restartGame()
+            presenter.skipCurrentQuestion()
         }
         alertPresenter.show(in: self, model: model)
     }
+    
+    // MARK: - Private functions
     
     private func switchButton(IsEnabled: Bool) {
         yesButton.isEnabled = IsEnabled
