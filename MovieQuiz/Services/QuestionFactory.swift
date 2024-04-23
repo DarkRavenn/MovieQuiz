@@ -8,6 +8,7 @@
 import Foundation
 
 class QuestionFactory: QuestionFactoryProtocol {
+    
     private let moviesLoader: MoviesLoading
     
     weak var delegate: QuestionFactoryDelegate?
@@ -25,13 +26,8 @@ class QuestionFactory: QuestionFactoryProtocol {
                     guard let self = self else { return }
                     switch result {
                     case .success(let mostPopularMovies):
-                        if mostPopularMovies.errorMessage == "" {
-                            self.movies = mostPopularMovies.items
-                            self.delegate?.didLoadDataFromServer()
-                        } else {
-                            self.delegate?.didLoadDataFromServer(with: mostPopularMovies.errorMessage)
-                        }
-                        
+                        self.movies = mostPopularMovies.items
+                        self.delegate?.didLoadDataFromServer()
                     case .failure(let error):
                         self.delegate?.didFailToLoadData(with: error)
                     }
@@ -53,7 +49,7 @@ class QuestionFactory: QuestionFactoryProtocol {
             } catch {
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
-                    self.delegate?.didLoadImageFromServer(with: error)
+                    self.delegate?.didFailToLoadData(with: error)
                 }
             }
             

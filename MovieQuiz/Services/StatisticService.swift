@@ -21,6 +21,7 @@ final class StatisticServiceImplementation: StatisticService {
     private let userDefaults = UserDefaults.standard
     
     // MARK: Public methods
+    
     func store(correct count: Int, total amount: Int) {
         self.correct += count
         self.total += amount
@@ -34,6 +35,7 @@ final class StatisticServiceImplementation: StatisticService {
     }
     
     // MARK: - Public properties
+    
     var totalAccuracy: Double {
         Double(correct) / Double(total) * 100
     }
@@ -69,6 +71,7 @@ final class StatisticServiceImplementation: StatisticService {
     }
 
     // MARK: - Private properties
+    
     private var correct: Int {
         get {
             userDefaults.integer(forKey: Keys.correct.rawValue)
